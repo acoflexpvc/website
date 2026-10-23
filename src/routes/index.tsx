@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CategoryCard, EnquiryBand, SectionHeading } from "@/components/site";
-import { HeroSlider } from "@/components/hero/HeroSlider";
+import { HeroBanner, HeroCtas } from "@/components/hero/HeroBanner";
+import { readBannerImages } from "@/lib/hero-banner";
 import {
   allProducts as fallbackAllProducts,
   categories as fallbackCategories,
@@ -75,6 +76,16 @@ function Index() {
     label: "Contact sales",
     to: "/contact",
   };
+  // Rotating banner images published with the home page; empty → static factory hero.
+  const bannerImages = readBannerImages(content?.["hero"]);
+  const heroCopy = (
+    <>
+      <p className="kicker !text-white/80">{heroKicker}</p>
+      <h1 className="h-hero mt-6">{heroTitle}</h1>
+      <p className="lede mt-6 text-white/90 lg:text-white/75">{heroLede}</p>
+      <HeroCtas primary={heroCtaPrimary} secondary={heroCtaSecondary} />
+    </>
+  );
 
   const homeStrengths =
     Array.isArray(content?.strengths) && content.strengths.length > 0
@@ -115,9 +126,9 @@ function Index() {
   const highlightSteps = processSteps.slice(3);
   return (
     <>
-      {/* Hero: published slides when available, otherwise the CMS-driven static hero. */}
-      <HeroSlider
-        pageHeading={heroTitle}
+      {/* Hero: shared CMS text over published banner images, otherwise the static factory hero. */}
+      <HeroBanner
+        images={bannerImages}
         fallback={
           <section className="relative overflow-hidden bg-forest text-white">
             {/* Desktop and mobile heroes each use a 1px placeholder outside their breakpoint so only one photo downloads. */}
@@ -151,28 +162,14 @@ function Index() {
               className="absolute inset-x-0 bottom-1 top-0 bg-[linear-gradient(to_bottom,color-mix(in_oklab,var(--forest)_55%,transparent)_0%,color-mix(in_oklab,var(--forest)_40%,transparent)_55%,transparent_80%)] lg:hidden"
             />
             <div className="site-container relative grid items-center pb-32 pt-12 sm:pb-40 sm:pt-16 lg:min-h-[38rem] lg:grid-cols-12 lg:py-24">
-              <div className="lg:col-span-6">
-                <p className="kicker !text-white/80">{heroKicker}</p>
-                <h1 className="h-hero mt-6">{heroTitle}</h1>
-                <p className="lede mt-6 text-white/90 lg:text-white/75">{heroLede}</p>
-                <div className="mt-9 flex flex-wrap gap-3">
-                  <Button asChild variant="gold" size="lg">
-                    <Link to={heroCtaPrimary.to || "/products"}>
-                      {heroCtaPrimary.label || "Explore products"} <ArrowRight />
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outlineLight" size="lg">
-                    <Link to={heroCtaSecondary.to || "/contact"}>
-                      {heroCtaSecondary.label || "Contact sales"}
-                    </Link>
-                  </Button>
-                </div>
-              </div>
+              <div className="lg:col-span-6">{heroCopy}</div>
             </div>
             <div className="relative h-1 bg-gold" />
           </section>
         }
-      />
+      >
+        {heroCopy}
+      </HeroBanner>
 
       {/* Strengths */}
       <section className="bg-forest-deep text-white">
